@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".AdicionarManga">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/linearLayoutAdicionarManga"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:background="@drawable/bg_gradient"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/button_voltar_add_manga"
+                android:layout_width="60dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:clickable="true"
+                android:onClick="fechaTelaDeNovoManga"
+                android:src="@drawable/ic_arrow_back" />
+
+            <TextView
+                android:id="@+id/textViewAdicionarManga"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="Adicionar mangá"
+                android:textSize="25sp"
+                android:textStyle="bold" />
+
+
+        </LinearLayout>
+
+        <EditText
+            android:id="@+id/editIsbnNovoManga"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="text"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="20dp"
+            android:hint="ISBN do mangá" />
+
+        <TextView
+            android:id="@+id/textViewBuscaPeloIsbn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:onClick="buscarMangaPorIsbn"
+            android:text="Clique para buscar"
+            android:textColor="#4400D3"
+            android:layout_marginLeft="20dp"            />
+
+        <EditText
+            android:id="@+id/editTituloNovoManga"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="text"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="20dp"
+            android:hint="Título do mangá"
+            android:enabled="false"
+            />
+
+        <EditText
+            android:id="@+id/editImagemNovoManga"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="text"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="20dp"
+            android:hint="Link da capa do novo mangá"
+            android:enabled="false" />
+
+        <EditText
+            android:id="@+id/editPaginasNovoManga"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="text"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="20dp"
+            android:hint="Número de páginas do novo mangá"
+            android:enabled="false" />
+
+        <EditText
+            android:id="@+id/editEditoraNovoManga"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="text"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="20dp"
+            android:hint="Editora do novo mangá"
+            android:enabled="false"  />
+
+        <EditText
+            android:id="@+id/editDataDaPublicacaoNovoManga"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="text"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="20dp"
+            android:hint="Data da publicação do novo mangá"
+            android:enabled="false" />
+
+        <Button
+            android:id="@+id/buttonAdicionarNovoManga"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="20dp"
+            android:text="Adicionar mangá"
+            android:clickable="true"
+            android:onClick="adicionarNovoManga"
+             />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

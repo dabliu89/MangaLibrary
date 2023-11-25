@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".AdicionarAmigo">
+
+    <LinearLayout
+        android:id="@+id/linearLayoutNovoAmigo"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:background="@drawable/bg_gradient"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/button_voltar_novoAmigo"
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:clickable="true"
+            android:onClick="fechaTelaNovoAmigo"
+            android:src="@drawable/ic_arrow_back" />
+
+        <TextView
+            android:id="@+id/textViewNovoAmigo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="Adicionar amigo"
+            android:textSize="25sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layoutCampoDeBuscaNovoAmigo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_margin="10dp"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayoutNovoAmigo">
+
+        <EditText
+            android:id="@+id/campoDeBuscaNovoAmigo"
+            android:layout_width="307dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp"
+            android:hint="Buscar novo amigo"
+            android:inputType="text" />
+
+        <ImageView
+            android:id="@+id/imageViewBuscaNovoAmigo"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="10dp"
+            android:clickable="true"
+            android:onClick="buscarNovoAmigo"
+            android:src="@drawable/ic_search" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/textViewResetBuscaNovoAmigo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:clickable="true"
+        android:onClick="resetarBuscaAmigos"
+        android:text="Clique para resetar"
+        android:textColor="#4400D3"
+        android:layout_marginLeft="20dp"
+        app:layout_constraintTop_toBottomOf="@+id/layoutCampoDeBuscaNovoAmigo"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ListView
+        android:id="@+id/listaDeNovosAmigos"
+        android:choiceMode="singleChoice"
+        android:listSelector="#A485A3"
+        android:layout_width="371dp"
+        android:layout_height="470dp"
+        android:layout_margin="20dp"
+        android:layout_gravity="bottom"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewResetBuscaNovoAmigo"/>
+
+    <Button
+        android:id="@+id/button6"
+        android:layout_width="371dp"
+        android:layout_height="wrap_content"
+        android:text="Adicionar amigo selecionado"
+        android:layout_margin="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/listaDeNovosAmigos"
+        android:clickable="true"
+        android:onClick="adicionarAmigoSelecionado"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

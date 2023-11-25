@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_biblioteca"
+        android:icon="@drawable/ic_biblioteca"
+        android:title="Biblioteca"/>
+
+    <item
+        android:id="@+id/navigation_amigos"
+        android:icon="@drawable/ic_amigos"
+        android:title="Amigos"/>
+
+    <item
+        android:id="@+id/navigation_lojas"
+        android:icon="@drawable/ic_lojas"
+        android:title="Lojas"/>
+
+    <item
+        android:id="@+id/navigation_perfil"
+        android:icon="@drawable/ic_perfil"
+        android:title="Perfil"/>
+
+</menu>

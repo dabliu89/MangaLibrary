@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1014614006507",
+    "project_id": "manga-library-5011a",
+    "storage_bucket": "manga-library-5011a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1014614006507:android:dcc34cc9d02c2a3d407cae",
+        "android_client_info": {
+          "package_name": "com.example.mangalibrary"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBe-qG6O589RHccptfIvj8pbVxOGYdyHuc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
