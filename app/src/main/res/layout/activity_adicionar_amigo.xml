@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/bg_telas"
     tools:context=".AdicionarAmigo">
 
     <LinearLayout
@@ -85,6 +86,7 @@
         android:layout_height="470dp"
         android:layout_margin="20dp"
         android:layout_gravity="bottom"
+        android:background="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textViewResetBuscaNovoAmigo"/>

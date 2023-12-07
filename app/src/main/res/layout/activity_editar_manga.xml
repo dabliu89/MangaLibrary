@@ -39,17 +39,6 @@
         </LinearLayout>
 
         <EditText
-            android:id="@+id/editIsbnMangaEmEdicao"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:inputType="text"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:layout_marginTop="20dp"
-            android:hint="ISBN do mangá" />
-
-        <EditText
             android:id="@+id/editTituloMangaEmEdicao"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

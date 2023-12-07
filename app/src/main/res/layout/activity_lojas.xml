@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/bg_telas"
     tools:context=".Lojas">
 
     <LinearLayout
@@ -35,22 +36,34 @@
             android:textStyle="bold" />
     </LinearLayout>
 
-    <Spinner
-        android:id="@+id/spinner"
-        android:layout_width="380dp"
-        android:layout_height="wrap_content"
+<!--    <Spinner-->
+<!--        android:id="@+id/spinner"-->
+<!--        android:layout_width="fill_parent"-->
+<!--        android:layout_height="50dp"-->
+<!--        android:layout_margin="20dp"-->
+<!--        android:textColor="@color/black"-->
+<!--        android:spinnerMode="dropdown"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/linearLayoutLojas" />-->
+
+    <ListView
+        android:id="@+id/listLojas"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
         android:layout_margin="20dp"
+        android:background="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayoutLojas" />
+        app:layout_constraintTop_toBottomOf="@+id/linearLayoutLojas"/>
 
     <com.google.android.gms.maps.MapView
-        android:id="@+id/mapView"
+        android:id="@+id/mapaLojas"
         android:layout_width="match_parent"
-        android:layout_height="550dp"
+        android:layout_height="400dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/spinner" />
+        app:layout_constraintTop_toBottomOf="@+id/listLojas" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -17,33 +17,36 @@ import com.example.mangalibrary.Mocks.UsuariosDAO;
 import com.example.mangalibrary.Models.Manga;
 import com.example.mangalibrary.Models.Noticia;
 import com.example.mangalibrary.Models.Usuario;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 public class Amigos extends AppCompatActivity {
 
-    UsuariosDAO usuarios;
-    MangasDAO mangas;
-    String usuarioAtivo;
-    ArrayList<String> todosOsAmigos;
     ArrayList<Usuario> resultadosDaBuscaPorAmigos;
     ListView listaDeAmigos;
     ArrayAdapter adapter;
+    private FirebaseAuth mAuth;
+    private FirebaseFirestore db;
+    String userId;
     EditText campoDeBuscaPorAmigos;
     int selected;
-    int resultadoMudanca;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_amigos);
+        mAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
+        listaDeAmigos = findViewById(R.id.listaDeAmigos);
+        resultadosDaBuscaPorAmigos = new ArrayList<Usuario>();
         this.selected = -1;
-        Intent intent = getIntent();
-        this.usuarios = (UsuariosDAO) intent.getSerializableExtra("usuarios");
-        this.mangas = (MangasDAO) intent.getSerializableExtra("mangas");
-        this.usuarioAtivo = (String) intent.getStringExtra("usuarioAtivo");
-        Log.e("CHECK DATA",this.usuarioAtivo);
+        userId = mAuth.getCurrentUser().getUid();
         campoDeBuscaPorAmigos = (EditText) findViewById(R.id.campoDeBuscaAmigos);
         setListaAmigosInicial();
         listaDeAmigos.setOnItemClickListener( new AdapterView.OnItemClickListener()
@@ -54,76 +57,85 @@ public class Amigos extends AppCompatActivity {
                 selected = position;
                 Intent verAmigo = new Intent(Amigos.this, VerAmigo.class);
                 verAmigo.putExtra("amigo", resultadosDaBuscaPorAmigos.get(selected));
-                verAmigo.putExtra("mangas", mangas);
                 startActivityForResult(verAmigo,51);
             }
         } );
     }
 
     private void setListaAmigosInicial() {
-        this.todosOsAmigos = new ArrayList<String>();
-        this.todosOsAmigos.addAll(this.usuarios.buscarUser(usuarioAtivo).getAmigos());
-        resultadosDaBuscaPorAmigos = new ArrayList<Usuario>();
-        for (String str : todosOsAmigos) {
-            for (Usuario user : this.usuarios.usuariosAtivos) {
-                if (str.equals(user.email) && str.equals(this.usuarioAtivo) != true) {
-                    resultadosDaBuscaPorAmigos.add(user);
+        resultadosDaBuscaPorAmigos.clear();
+        DocumentReference currentUserRef = db.collection("Usuarios").document(userId);
+
+        currentUserRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document.exists()) {
+                    List<String> amigos = (List<String>) document.get("amigos");
+                    if (amigos != null && !amigos.isEmpty()) {
+                        for (String amigoId : amigos) {
+                            DocumentReference amigoRef = db.collection("Usuarios").document(amigoId);
+                            amigoRef.get().addOnCompleteListener(amigoTask -> {
+                                if (amigoTask.isSuccessful()) {
+                                    DocumentSnapshot amigoDocument = amigoTask.getResult();
+                                    if (amigoDocument.exists()) {
+                                        Usuario amigo = amigoDocument.toObject(Usuario.class);
+                                        amigo.setId(amigoDocument.getId());
+                                        resultadosDaBuscaPorAmigos.add(amigo);
+                                        adapter.notifyDataSetChanged();
+                                    }
+                                }
+                            });
+                        }
+                    } else {
+                        Toast.makeText(Amigos.this, "O usuário logado não possui amigos.", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Log.e("CHECK", "O documento do usuário logado não existe");
                 }
+            } else {
+                Log.e("CHECK", "Falha ao obter o documento do usuário logado");
             }
-        }
-        listaDeAmigos = this.findViewById(R.id.listaDeAmigos);
-        adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, resultadosDaBuscaPorAmigos);
-        listaDeAmigos.setAdapter(adapter);
+        });
+         adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, resultadosDaBuscaPorAmigos);
+         listaDeAmigos.setAdapter(adapter);
     }
 
-    public void buscarAmigos (View view) {
+
+    public void buscarAmigos(View view) {
         if (campoDeBuscaPorAmigos.getText().toString().isEmpty()) {
-            Log.e("CHECK","Termo de busca não encontrado.");
             Toast toast = Toast.makeText(this, "Insira um termo de busca.", Toast.LENGTH_LONG);
             toast.show();
             return;
         }
-        String termoDeBusca = campoDeBuscaPorAmigos.getText().toString();
-        resultadosDaBuscaPorAmigos.clear();
-        for (String str : todosOsAmigos) {
-            for (Usuario user : this.usuarios.usuariosAtivos) {
-                if (user.getEmail().equals(str) && user.getNome().contains(termoDeBusca)) {
-                    resultadosDaBuscaPorAmigos.add(user);
-                }
+
+        String termoDeBusca = campoDeBuscaPorAmigos.getText().toString().toLowerCase();
+
+        ArrayList<Usuario> amigosEncontrados = new ArrayList<>();
+
+        for (Usuario amigo : resultadosDaBuscaPorAmigos) {
+            String nomeAmigo = amigo.getNome().toLowerCase();
+
+            if (nomeAmigo.contains(termoDeBusca)) {
+                amigosEncontrados.add(amigo);
             }
         }
-        this.adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, resultadosDaBuscaPorAmigos);
+
+        adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, amigosEncontrados);
         listaDeAmigos.setAdapter(adapter);
     }
 
+
     public void resetarBuscaAmigos (View view) {
-        resultadosDaBuscaPorAmigos.clear();
-        for (String str : todosOsAmigos) {
-            for (Usuario user : this.usuarios.usuariosAtivos) {
-                if (str.equals(user.email) && str.equals(usuarioAtivo) != true) {
-                    resultadosDaBuscaPorAmigos.add(user);
-                }
-            }
-        }
         adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, resultadosDaBuscaPorAmigos);
         listaDeAmigos.setAdapter(adapter);
     }
 
     public void adicionarAmigo (View view) {
-        Intent addAmigo = new Intent(this, AdicionarAmigo.class);
-        addAmigo.putExtra("usuarios", this.usuarios);
-        addAmigo.putExtra("todosOsAmigos",this.todosOsAmigos);
-        addAmigo.putExtra("usuarioAtivo", this.usuarioAtivo);
-        startActivityForResult(addAmigo,51);
+        Intent intent = new Intent(this, AdicionarAmigo.class);
+        startActivityForResult(intent,51);
     }
 
     public void fechaTelaMeusAmigos (View view) {
-        if (resultadoMudanca == 52) {
-            Intent intent = new Intent();
-            intent.putExtra("usuarios",usuarios);
-            setResult(resultadoMudanca,intent);
-            finish();
-        }
         setResult(00);
         finish();
     }
@@ -131,71 +143,11 @@ public class Amigos extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 51 && resultCode == 52) {
-            Usuario recebeNovoAmigo = (Usuario) data.getExtras().get("novoAmigo");
-            usuarios.buscarUser(usuarioAtivo).getAmigos().add(recebeNovoAmigo.getEmail());
-            usuarios.buscarUser(recebeNovoAmigo.getEmail()).getAmigos().add(usuarioAtivo);
-            todosOsAmigos.clear();
-            Log.e("ARRAY SIZE", ""+todosOsAmigos.size());
-            todosOsAmigos.addAll(usuarios.buscarUser(usuarioAtivo).getAmigos());
-            Log.e("ARRAY SIZE", ""+todosOsAmigos.size());
-            resultadosDaBuscaPorAmigos.clear();
-            for (String str : todosOsAmigos) {
-                for (Usuario user : this.usuarios.usuariosAtivos) {
-                    if (str.equals(user.email) && str.equals(usuarioAtivo) != true) {
-                        resultadosDaBuscaPorAmigos.add(user);
-                    }
-                }
-            }
-            adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, resultadosDaBuscaPorAmigos);
-            listaDeAmigos.setAdapter(adapter);
-            Toast toast = Toast.makeText(this, "Amigo adicionado com sucesso.", Toast.LENGTH_LONG);
-            toast.show();
-            resultadoMudanca = 52;
-        }
-        if (requestCode == 51 && resultCode == 53) {
-            String amigoParaExlusao = (String) data.getExtras().get("amigoParaExclusão");
-            for (Usuario user : usuarios.usuariosAtivos) {
-                if (user.getEmail().equals(usuarioAtivo)) {
-                    Iterator<String> iterator = user.getAmigos().iterator();
-                    while (iterator.hasNext()) {
-                        if (iterator.next().contains(amigoParaExlusao)) {
-                            iterator.remove();
-                            break;
-                        }
-                    }
-                }
-            }
-            for (Usuario user : usuarios.usuariosAtivos) {
-                if (user.getEmail().equals(amigoParaExlusao)) {
-                    Iterator<String> iterator = user.getAmigos().iterator();
-                    while (iterator.hasNext()) {
-                        if (iterator.next().contains(usuarioAtivo)) {
-                            iterator.remove();
-                            break;
-                        }
-                    }
-                }
-            }
-            todosOsAmigos.clear();
-            Log.e("ARRAY SIZE", ""+todosOsAmigos.size());
-            todosOsAmigos.addAll(usuarios.buscarUser(usuarioAtivo).getAmigos());
-            Log.e("ARRAY SIZE", ""+todosOsAmigos.size());
-            resultadosDaBuscaPorAmigos.clear();
-            for (String str : todosOsAmigos) {
-                for (Usuario user : this.usuarios.usuariosAtivos) {
-                    if (str.equals(user.email) && str.equals(usuarioAtivo) != true) {
-                        resultadosDaBuscaPorAmigos.add(user);
-                    }
-                }
-            }
-            adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, resultadosDaBuscaPorAmigos);
-            listaDeAmigos.setAdapter(adapter);
-            resultadoMudanca = 52;
-            Toast toast = Toast.makeText(this, "Amizade desfeita com sucesso.", Toast.LENGTH_LONG);
-            toast.show();
+            setListaAmigosInicial();
         }
         else {
             Log.e("Result","Solicitação cancelada.");
         }
     }
+
 }

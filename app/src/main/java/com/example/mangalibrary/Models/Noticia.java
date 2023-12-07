@@ -4,14 +4,34 @@ import java.io.Serializable;
 
 public class Noticia implements Serializable {
 
+    public String idNoticia;
     public String titulo;
     public String imagem;
     public String texto;
+
+    public Noticia (String id, String titulo, String imagem, String texto) {
+        this.idNoticia = id;
+        this.titulo = titulo;
+        this.imagem = imagem;
+        this.texto = texto;
+    }
 
     public Noticia (String titulo, String imagem, String texto) {
         this.titulo = titulo;
         this.imagem = imagem;
         this.texto = texto;
+    }
+
+    public Noticia () {
+
+    }
+
+    public String getIdNoticia() {
+        return idNoticia;
+    }
+
+    public void setIdNoticia(String idNoticia) {
+        this.idNoticia = idNoticia;
     }
 
     public String getTitulo() {

@@ -61,15 +61,6 @@
             android:hint="Repetir nova senha"
             android:inputType="text" />
 
-        <EditText
-            android:id="@+id/editAlterarSenhaAtual"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:ems="10"
-            android:hint="Senha atual"
-            android:inputType="textPassword" />
-
         <Button
             android:id="@+id/buttonAlterarSenha"
             android:layout_width="match_parent"

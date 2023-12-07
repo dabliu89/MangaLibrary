@@ -4,29 +4,33 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.mangalibrary.Mocks.NoticiasDAO;
+import com.example.mangalibrary.Models.Noticia;
+
 public class EditarNoticia extends AppCompatActivity {
 
-    TextView tituloDaNoticia;
-    TextView imagemDaNoticia;
-    TextView textoDaNoticia;
+    TextView tituloDaNoticia, imagemDaNoticia, textoDaNoticia;
+    Noticia noticia;
+    NoticiasDAO noticiasDAO;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editar_noticia);
-        setEdicaoNoticiaViews();
-        Intent intent = getIntent();
 
-        String titulo = intent.getStringExtra("tituloDaNoticia");
-        String imagem = intent.getStringExtra("imagemDaNoticia");
-        String texto = intent.getStringExtra("textDaNoticia");
+        noticiasDAO = new NoticiasDAO();
+        setEdicaoNoticiaViews();
+
+        Intent intent = getIntent();
+        noticia = (Noticia) intent.getSerializableExtra("noticia");
+        String titulo = noticia.getTitulo();
+        String imagem = noticia.getImagem();
+        String texto = noticia.getTexto();
         setEdicaoNoticiaViewsContent(titulo, imagem, texto);
     }
 
@@ -47,16 +51,14 @@ public class EditarNoticia extends AppCompatActivity {
         String novaImagemNoticia = imagemDaNoticia.getText().toString();
         String novoTextoNoticia = textoDaNoticia.getText().toString();
         if (novoTituloNoticia.isEmpty() || novaImagemNoticia.isEmpty() || novoTextoNoticia.isEmpty()) {
-            Log.e("CHECK","Há campos náo preenchidos.");
             Toast toast = Toast.makeText(this, "Ação requer o preenchimento de todos os campos.", Toast.LENGTH_LONG);
             toast.show();
             return;
         }
-        Intent intent = new Intent();
-        intent.putExtra("novoTituloDaNoticia",novoTituloNoticia);
-        intent.putExtra("novaImagemNoticia",novaImagemNoticia);
-        intent.putExtra("novoTextoNoticia",novoTextoNoticia);
-        setResult(33, intent);
+        noticiasDAO.atualizarNoticiaNoFirestore(this.noticia.getIdNoticia(),novoTituloNoticia,novaImagemNoticia,novoTextoNoticia);
+        Toast toast = Toast.makeText(this, "Notícia editada.", Toast.LENGTH_LONG);
+        toast.show();
+        setResult(33);
         finish();
     }
 

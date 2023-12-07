@@ -48,26 +48,10 @@
             android:id="@+id/textViewExcluirContaMsg"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Para confirmar a exclusão da sua conta, insira a sua senha abaixo:"
+            android:text="Para confirmar a exclusão da sua conta, clique no botão abaixo:"
             android:textSize="20sp"/>
 
-        <EditText
-            android:id="@+id/editSenhaExcluirConta"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="Insira sua senha"
-            android:layout_marginTop="20dp"
-            android:inputType="text" />
 
-        <EditText
-            android:id="@+id/editSenhaExcluirContaRepete"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:ems="10"
-            android:hint="Repita a sua senha"
-            android:inputType="text" />
 
         <Button
             android:id="@+id/buttonExcluirConta"

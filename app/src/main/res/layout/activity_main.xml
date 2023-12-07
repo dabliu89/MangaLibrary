@@ -4,13 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:background="@drawable/bg_tela_login">
 
     <LinearLayout
         android:id="@+id/linearLayout3"
         android:layout_width="294dp"
-        android:layout_height="359dp"
+        android:layout_height="400dp"
         android:orientation="vertical"
+        android:background="@drawable/bg_loginbox"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -21,6 +23,7 @@
             android:layout_height="wrap_content"
             android:text="漫画"
             android:textAlignment="center"
+            android:layout_marginTop="20dp"
             android:textSize="34sp" />
 
         <TextView
@@ -37,6 +40,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10pt"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
             android:ems="10"
             android:hint="Usuário"
             android:inputType="text" />
@@ -47,6 +52,8 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="10pt"
             android:ems="10"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
             android:hint="Senha"
             android:inputType="text"
             android:password="true" />
@@ -56,14 +63,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10pt"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
             android:onClick="login"
             android:text="Entrar" />
 
         <TextView
             android:id="@+id/textView3"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
+            android:layout_gravity="center"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:onClick="abrirRecuperarSenha"
             android:text="Esqueceu a senha?"
             android:textAlignment="center" />
@@ -85,7 +94,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Não tem uma conta? "
-            android:textAlignment="textEnd" />
+            android:textAlignment="textEnd"
+            android:textColor="@color/white"/>
 
         <TextView
             android:id="@+id/textView2"
@@ -94,8 +104,9 @@
             android:layout_weight="1"
             android:onClick="abrirCadastro"
             android:text="Cadastre-se"
+            android:textStyle="bold"
             android:textAlignment="textStart"
-            android:textColor="#673AB7" />
+            android:textColor="@color/white" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -11,8 +11,20 @@ public class Manga implements Serializable {
     public String dataPublicacao;
     public String capa;
 
+    public Manga () {
+
+    }
+
     public Manga (String isbn, String titulo, String paginas, String editora, String dataPublicacao, String capa) {
         this.isbn = isbn;
+        this.titulo = titulo;
+        this.paginas = paginas;
+        this.editora = editora;
+        this.dataPublicacao = dataPublicacao;
+        this.capa = capa;
+    }
+
+    public Manga (String titulo, String paginas, String editora, String dataPublicacao, String capa) {
         this.titulo = titulo;
         this.paginas = paginas;
         this.editora = editora;

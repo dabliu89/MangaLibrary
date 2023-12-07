@@ -3,48 +3,145 @@ package com.example.mangalibrary.Mocks;
 import android.util.Log;
 
 import com.example.mangalibrary.Models.Manga;
-import com.example.mangalibrary.Models.Noticia;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.io.Serializable;
-import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
 
-public class MangasDAO implements Serializable {
+public class MangasDAO {
 
-    public ArrayList<Manga> mangasCadastrados;
-
-    public MangasDAO () {
-        this.mangasCadastrados = new ArrayList<Manga>();
-        mangasCadastrados.add(new Manga("6555122110", "Demon Slayer #06", "200", "Panini", "31/05/2022",
-                "https://images-americanas.b2w.io/produtos/1885003890/imagens/demon-slayer-kimetsu-no-yaiba-vol-06/1885003890_1_large.jpg"));
-        mangasCadastrados.add(new Manga("8577879461","YuYu Hakusho #04", "200", "JBC", "07/03/2023",
-                "https://jbchost.com.br/editorajbc/wp-content/uploads/2023/01/yuyu-hakusho-04-capa-770x1169.jpg"));
-        mangasCadastrados.add(new Manga("8542615506","Lobo Solitário #14", "320", "Panini", "17/05/2019",
-                "https://m.media-amazon.com/images/I/812JLsD8gpL._AC_UF1000,1000_QL80_.jpg"));
-        mangasCadastrados.add(new Manga("6555128224","Berserk #40","176","Panini","30/03/2022",
-                "https://m.media-amazon.com/images/I/61uOlsJQr3L._AC_UF894,1000_QL80_.jpg"));
-        mangasCadastrados.add(new Manga("8542606051","One-Punch Man #07","216","Panini","08/12/2014",
-                "https://m.media-amazon.com/images/I/81fd89HBiZL._SL1500_.jpg"));
-        mangasCadastrados.add(new Manga("8545702876","Akira #01","352","JBC","22/08/2022",
-                "https://m.media-amazon.com/images/I/61ud5BuLRML._SL1000_.jpg"));
-        mangasCadastrados.add(new Manga("857787463X","Hunter x Hunter #28","200","JBC","06/05/2022",
-                "https://m.media-amazon.com/images/I/71+dkJkj48L._SL1000_.jpg"));
-        mangasCadastrados.add(new Manga("8545707290","FullMetal Alchemist #21","192","JBC","24/06/2022",
-                "https://m.media-amazon.com/images/I/61loOqxgL4L._SL1000_.jpg"));
-        Log.e("Data check", "Mangás cadastrados: " + mangasCadastrados.size());
+    public interface MangasLoadListener {
+        void onMangasLoaded(List<Manga> mangas);
+        void onMangasLoadFailed();
     }
 
-    public Manga buscarManga (String isbn) {
-        for (Manga manga : mangasCadastrados) {
-            if (manga.getIsbn().equals(isbn)){
-                return manga;
+    public interface MangaLoadListener {
+        void onMangaLoaded(Manga manga);
+        void onMangaLoadFailed();
+    }
+
+    public interface DocumentExistenceListener {
+        void onDocumentExists(boolean exists);
+        void onCheckFailed();
+    }
+
+    public interface MangaAddListener {
+        void onMangaAdded();
+        void onAddMangaFailed();
+    }
+
+    public void carregarMangasDoUsuario(String userId, MangasLoadListener listener) {
+        List<Manga> mangas = new ArrayList<>();
+        DocumentReference usuarioRef = FirebaseFirestore.getInstance().collection("Usuarios").document(userId);
+
+        usuarioRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                List<String> mangasDoUsuario = (List<String>) task.getResult().get("mangas");
+
+                if (mangasDoUsuario != null && !mangasDoUsuario.isEmpty()) {
+                    for (String mangaId : mangasDoUsuario) {
+                        DocumentReference mangaRef = FirebaseFirestore.getInstance().collection("Mangas").document(mangaId);
+                        mangaRef.get().addOnCompleteListener(mangaTask -> {
+                            if (mangaTask.isSuccessful()) {
+                                DocumentSnapshot mangaDoc = mangaTask.getResult();
+                                if (mangaDoc.exists()) {
+                                    String isbn = mangaId;
+                                    String titulo = mangaDoc.getString("titulo");
+                                    String paginas = mangaDoc.getString("paginas");
+                                    String editora = mangaDoc.getString("editora");
+                                    String dataPublicacao = mangaDoc.getString("dataPublicacao");
+                                    String capa = mangaDoc.getString("capa");
+
+                                    Manga manga = new Manga(isbn, titulo, paginas, editora, dataPublicacao, capa);
+                                    mangas.add(manga);
+
+                                    if (mangas.size() == mangasDoUsuario.size()) {
+                                        listener.onMangasLoaded(mangas);
+                                    }
+                                } else {
+                                    listener.onMangasLoadFailed();
+                                }
+                            } else {
+                                listener.onMangasLoadFailed();
+                            }
+                        });
+                    }
+                } else {
+                    listener.onMangasLoaded(mangas);
+                }
+            } else {
+                listener.onMangasLoadFailed();
             }
-        }
-        return null;
+        });
     }
 
-    public ArrayList<Manga> getMangasCadastrados () {
-        return this.mangasCadastrados;
+    public void buscarMangaPorId(String idDoManga, MangasDAO.MangaLoadListener listener) {
+        DocumentReference docRef = FirebaseFirestore.getInstance().collection("Mangas").document(idDoManga);
+
+        docRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document.exists()) {
+                    Manga manga = document.toObject(Manga.class);
+                    if (manga != null) {
+                        listener.onMangaLoaded(manga);
+                    } else {
+                        listener.onMangaLoadFailed();
+                    }
+                } else {
+                    listener.onMangaLoadFailed();
+                }
+            } else {
+                listener.onMangaLoadFailed();
+            }
+        });
+    }
+
+    public void verificarExistenciaManga(String idDoManga, MangasDAO.DocumentExistenceListener listener) {
+        DocumentReference docRef = FirebaseFirestore.getInstance().collection("Mangas").document(idDoManga);
+
+        docRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document.exists()) {
+                    listener.onDocumentExists(true);
+                } else {
+                    listener.onDocumentExists(false);
+                }
+            } else {
+                listener.onCheckFailed();
+            }
+        });
+    }
+
+    public void adicionarNovoManga(String isbn, String titulo, String paginas, String editora, String dataPublicacao, String capa, String userId, MangaAddListener listener) {
+        Manga newManga = new Manga(isbn, titulo, paginas, editora, dataPublicacao, capa);
+
+        DocumentReference novoDocumentoRef = FirebaseFirestore.getInstance().collection("Mangas").document(isbn);
+
+        novoDocumentoRef.set(newManga)
+                .addOnSuccessListener(aVoid -> {
+                    adicionarMangaAoUsuario(userId, isbn);
+                    listener.onMangaAdded();
+                })
+                .addOnFailureListener(e -> {
+                    listener.onAddMangaFailed();
+                });
+    }
+
+    private void adicionarMangaAoUsuario(String idDoUsuario, String idDoManga) {
+        DocumentReference usuarioRef = FirebaseFirestore.getInstance().collection("Usuarios").document(idDoUsuario);
+
+        usuarioRef.update("mangas", FieldValue.arrayUnion(idDoManga))
+                .addOnSuccessListener(aVoid -> {
+                    Log.d("Firestore", "ID do manga adicionado ao usuário com sucesso");
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Firestore", "Erro ao adicionar ID do manga ao usuário", e);
+                });
     }
 
 }

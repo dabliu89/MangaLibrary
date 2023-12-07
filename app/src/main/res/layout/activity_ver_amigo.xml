@@ -68,16 +68,28 @@
             android:id="@+id/emailAmigoVerAmigo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="5dp"
             android:layout_gravity="center"
             android:text="E-mail do amigo"
-            android:textSize="20sp"/>
+            android:textSize="15sp"/>
+
+        <TextView
+            android:id="@+id/textViewMangasAmigo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_gravity="left"
+            android:text="Biblioteca:"
+            android:textSize="15sp"
+            android:textStyle="bold"/>
 
         <ListView
             android:id="@+id/listViewMangasVerAmigo"
             android:layout_width="match_parent"
             android:layout_height="200dp"
-            android:layout_marginTop="20dp"/>
+            android:background="@drawable/bg_telas"
+
+            android:layout_marginTop="5dp"/>
 
         <Button
             android:id="@+id/button_excluir_amigo"

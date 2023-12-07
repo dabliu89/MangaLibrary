@@ -1,35 +1,42 @@
 package com.example.mangalibrary;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.example.mangalibrary.Mocks.UsuariosDAO;
+import com.example.mangalibrary.Mocks.NoticiasDAO;
 import com.example.mangalibrary.Models.Noticia;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.squareup.picasso.Picasso;
 
 public class VerNoticia extends AppCompatActivity {
 
-    int resultadoSolicitacao;
     TextView tituloDaNoticia;
     ImageView imagemDaNoticia;
     TextView textoDaNoticia;
     Noticia noticia;
-    int selectedAtual;
-
+    private FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ver_noticia);
-        this.resultadoSolicitacao = 00;
+
+        db = FirebaseFirestore.getInstance();
+
         Intent intent = getIntent();
-        selectedAtual = intent.getIntExtra("position",-1);
         setNoticiaViews();
         this.noticia = (Noticia) intent.getSerializableExtra("noticia");
         setNoticia(this.noticia);
@@ -49,52 +56,64 @@ public class VerNoticia extends AppCompatActivity {
 
     public void editarNoticia (View view) {
         Intent intent = new Intent(this, EditarNoticia.class);
-        intent.putExtra("tituloDaNoticia", this.tituloDaNoticia.getText());
-        intent.putExtra("imagemDaNoticia", this.noticia.getImagem());
-        intent.putExtra("textDaNoticia", this.textoDaNoticia.getText());
+        intent.putExtra("noticia", this.noticia);
         startActivityForResult(intent,31);
     }
 
+    public void excluirNoticiaAberta (View view) {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Confirmar exclusão");
+        builder.setMessage("Tem certeza de que deseja excluir esta notícia?");
+
+        builder.setPositiveButton("Sim", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                DocumentReference noticiaRef = db.collection("Noticias").document(noticia.getIdNoticia());
+
+                noticiaRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void unused) {
+                                Toast.makeText(VerNoticia.this, "Notícia excluída com sucesso!", Toast.LENGTH_SHORT).show();
+                                setResult(32);
+                                finish();
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Toast.makeText(VerNoticia.this, "Erro ao excluir notícia: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                Log.e("AdicionarNoticia", "Erro ao excluir notícia", e);
+                            }
+                        });
+            }
+        });
+
+        builder.setNegativeButton("Não", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+    }
+
     public void fechaTelaVerNoticia (View view) {
-        if (resultadoSolicitacao == 33) {
-            Intent intent = new Intent();
-            intent.putExtra("noticiaEditada",this.noticia);
-            intent.putExtra("posicaoDaNoticia",this.selectedAtual);
-            setResult(resultadoSolicitacao, intent);
-            finish();
-        }
-        else {
-            setResult(00);
-            finish();
-        }
+        setResult(00);
+        finish();
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 31 && resultCode == 33) {
-            String recebeNovoTituloDaNoticia = (String) data.getExtras().get("novoTituloDaNoticia");
-            String recebeNovaImagemNoticia = (String) data.getExtras().get("novaImagemNoticia");
-            String recebeNovoTextoNoticia = (String) data.getExtras().get("novoTextoNoticia");
-            this.resultadoSolicitacao = 33;
-            setEdicaoNoticiaAberta(recebeNovoTituloDaNoticia, recebeNovaImagemNoticia, recebeNovoTextoNoticia);
-            Log.e("STATUS CHECK", "Notícia editada.");
+            setResult(32);
+            finish();
         }
         else {
             Log.e("STATUS CHECK","Solicitação cancelada.");
         }
     }
 
-    private void setEdicaoNoticiaAberta(String recebeNovoTituloDaNoticia, String recebeNovaImagemNoticia, String recebeNovoTextoNoticia) {
-        this.noticia.setTitulo(recebeNovoTituloDaNoticia);
-        this.noticia.setImagem(recebeNovaImagemNoticia);
-        this.noticia.setTexto(recebeNovoTextoNoticia);
-        setNoticia(noticia);
-    }
-
-    public void excluirNoticiaAberta (View view) {
-        Intent intent = new Intent();
-        intent.putExtra("posicaoDaNoticia",this.selectedAtual);
-        setResult(34, intent);
-        finish();
-    }
 }

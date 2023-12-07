@@ -1,5 +1,6 @@
 package com.example.mangalibrary;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -11,34 +12,32 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.mangalibrary.Models.Manga;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class EditarManga extends AppCompatActivity {
 
+    private FirebaseFirestore db;
     Manga mangaEmEdicao;
     TextView tituloDoMangaEmEdicao;
     TextView imagemDoMangaEmEdicao;
     TextView totalDePaginasDoMangaEmEdicao;
     TextView editoraDoMangaEmEdicao;
     TextView dataPublicacaoDoMangaEmEdicao;
-    TextView isbnDoMangaEmEdicao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editar_manga);
+        db = FirebaseFirestore.getInstance();
         Intent intent = getIntent();
         this.mangaEmEdicao = (Manga) intent.getSerializableExtra("manga");
         setMangaViews();
         setMangaEmEdicao(this.mangaEmEdicao);
-    }
-
-    private void setMangaEmEdicao(Manga mangaEmEdicao) {
-        this.tituloDoMangaEmEdicao.setText(mangaEmEdicao.getTitulo());
-        this.imagemDoMangaEmEdicao.setText(mangaEmEdicao.getCapa());
-        this.totalDePaginasDoMangaEmEdicao.setText(mangaEmEdicao.getPaginas());
-        this.editoraDoMangaEmEdicao.setText(mangaEmEdicao.getEditora());
-        this.dataPublicacaoDoMangaEmEdicao.setText(mangaEmEdicao.getDataPublicacao());
-        this.isbnDoMangaEmEdicao.setText(mangaEmEdicao.getIsbn());
     }
 
     private void setMangaViews() {
@@ -47,26 +46,51 @@ public class EditarManga extends AppCompatActivity {
         this.totalDePaginasDoMangaEmEdicao = (TextView) findViewById(R.id.editPaginasMangaEmEdicao);
         this.editoraDoMangaEmEdicao = (TextView) findViewById(R.id.editEditoraMangaEmEdicao);
         this.dataPublicacaoDoMangaEmEdicao = (TextView) findViewById(R.id.editDataDaPublicacaoMangaEmEdicao);
-        this.isbnDoMangaEmEdicao = (TextView) findViewById(R.id.editIsbnMangaEmEdicao);
-        Log.e("CHECK SET", "Setou as views");
+    }
+
+    private void setMangaEmEdicao(Manga mangaEmEdicao) {
+        this.tituloDoMangaEmEdicao.setText(mangaEmEdicao.getTitulo());
+        this.imagemDoMangaEmEdicao.setText(mangaEmEdicao.getCapa());
+        this.totalDePaginasDoMangaEmEdicao.setText(mangaEmEdicao.getPaginas());
+        this.editoraDoMangaEmEdicao.setText(mangaEmEdicao.getEditora());
+        this.dataPublicacaoDoMangaEmEdicao.setText(mangaEmEdicao.getDataPublicacao());
     }
 
     public void processarEdicaoDoManga (View view) {
-        String novoTitulo = this.tituloDoMangaEmEdicao.getText().toString();
-        String novaCapa = this.imagemDoMangaEmEdicao.getText().toString();
-        String novoTotalDePaginas = this.totalDePaginasDoMangaEmEdicao.getText().toString();
-        String novaEditora = this.editoraDoMangaEmEdicao.getText().toString();
-        String novaDataDePublicacao = this.dataPublicacaoDoMangaEmEdicao.getText().toString();
-        String novoIsbn = this.isbnDoMangaEmEdicao.getText().toString();
-        if (novoTitulo.isEmpty() || novaCapa.isEmpty() || novoTotalDePaginas.isEmpty() || novaEditora.isEmpty() || novaDataDePublicacao.isEmpty() || novoIsbn.isEmpty()) {
+        String novoTitulo = this.tituloDoMangaEmEdicao.getText().toString().trim();
+        String novaCapa = this.imagemDoMangaEmEdicao.getText().toString().trim();
+        String novoTotalDePaginas = this.totalDePaginasDoMangaEmEdicao.getText().toString().trim();
+        String novaEditora = this.editoraDoMangaEmEdicao.getText().toString().trim();
+        String novaDataDePublicacao = this.dataPublicacaoDoMangaEmEdicao.getText().toString().trim();
+        if (novoTitulo.isEmpty() || novaCapa.isEmpty() || novoTotalDePaginas.isEmpty() || novaEditora.isEmpty() || novaDataDePublicacao.isEmpty()) {
             Toast toast = Toast.makeText(this, "A ação requer o preenchimento de todos os campos.", Toast.LENGTH_LONG);
             toast.show();
             return;
         }
-        Manga editManga = new Manga(novoIsbn,novoTitulo,novoTotalDePaginas,novaEditora,novaDataDePublicacao,novaCapa);
-        Intent intent = new Intent();
-        intent.putExtra("editManga", editManga);
-        setResult(44,intent);
-        finish();
+
+        Map<String, Object> manga = new HashMap<>();
+        manga.put("titulo", novoTitulo);
+        manga.put("paginas", novoTotalDePaginas);
+        manga.put("editora", novaEditora);
+        manga.put("dataPublicacao", novaDataDePublicacao);
+        manga.put("capa", novaCapa);
+
+        db.collection("Mangas").document(this.mangaEmEdicao.getIsbn())
+                .set(manga)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Toast.makeText(EditarManga.this, "Mangá editado com sucesso.", Toast.LENGTH_SHORT).show();
+                        setResult(42);
+                        finish();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(EditarManga.this, "Houve um problema ao editar o mangá.", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
     }
 }
